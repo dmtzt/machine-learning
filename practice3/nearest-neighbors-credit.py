@@ -46,10 +46,6 @@ X = np.stack((student, balance, income), axis=1)
 x_train, x_test, y_train, y_test = train_test_split(
     X, default, test_size=0.2, train_size=0.8, random_state=1, shuffle=True)
 
-plt.title('k-neighbors vs precision rate')
-plt.xlabel('k-neighbors')
-plt.ylabel('precision score')
-
 # K and ps values lists
 k_list = []
 ps_list = []
@@ -73,11 +69,16 @@ for k in n_neighbors_values:
     k_list.append(k)
     ps_list.append(ps)
 
+# k-neighbors vs precision rate scatterplot
+plt.title('k-neighbors vs precision rate')
+plt.xlabel('k-neighbors')
+plt.ylabel('precision score')
+
 # Scatter plot of k vs ps values
 plt.scatter(k_list, ps_list)
 plt.plot(k_list, ps_list)
 
 # Save plot
-plt.savefig('plot_k-neighbors_precision_score.png',
+plt.savefig('plot_credit_k-neighbors_precision_score.png',
             dpi=300, bbox_inches='tight')
 plt.clf()
