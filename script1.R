@@ -1,0 +1,1 @@
+data = read.table("Default.txt", header=FALSE);
