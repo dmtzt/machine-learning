@@ -52,7 +52,7 @@ model_d2 = LogisticRegression().fit(x_train_d2, y_train_d2)
 pred_d2 = model_d2.predict(x_test_d2)
 
 # precision score:
-ps = precision_score(pred_d2, y_test_d2)
+ps = model_d2.score(x_test_d2, y_test_d2)
 print('Precision got form sklearn.logisticReg: {ps}'.format(ps=ps))
 fres.write('\n*********************************\nPrecision got form sklearn.logisticReg: {ps}\n'.format(ps=ps))
 
