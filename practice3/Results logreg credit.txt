@@ -1,0 +1,8 @@
+
+*********************************
+Precision got form sklearn.logisticReg: 0.9745
+
+*******************************
+Confusion Matirx:
+[[1936   46]
+ [   5   13]]
