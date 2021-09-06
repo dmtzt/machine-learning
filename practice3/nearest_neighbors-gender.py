@@ -78,7 +78,8 @@ for k in n_neighbors_values:
     # Predict class labels for test test
     pred = nbrs.predict(x_test)
     # Compute precision score according to true and false positive
-    ps = precision_score(pred, y_test)
+    #ps = precision_score(pred, y_test)
+    ps = nbrs.score(x_test, y_test)
     # Compute precision matrix to evaluate accuracy
     cmat = confusion_matrix(pred, y_test)
     # Print results
