@@ -39,43 +39,43 @@ X = np.stack((height,weight), axis=1)
 
 
 #Making the 80%-20% sets
-x_train_d2, x_test_d2,y_train_d2, y_test_d2 =train_test_split(X,gender, test_size=0.2, train_size=0.8, random_state=1, shuffle=True)
-#fit the linear model
-model_d2 = LogisticRegression().fit(x_train_d2,y_train_d2)
+x_train, x_test,y_train, y_test =train_test_split(X,gender, test_size=0.2, train_size=0.8, random_state=1, shuffle=True)
+#fit the Logistic Regresion model
+model_logreg = LogisticRegression().fit(x_train,y_train)
 
 #Get prediction
-pred_d2 = model_d2.predict(x_test_d2)
+pred_logreg = model_logreg.predict(x_test)
 
 #precision score:
-#ps = precision_score(pred_d2,y_test_d2)
-ps = model_d2.score(x_test_d2, y_test_d2)
+#ps = precision_score(pred_logreg,y_test)
+ps = model_logreg.score(x_test, y_test)
 print('\n*********************************\nPrecision got form sklearn.logisticReg: {ps}'.format(ps=ps))
 fres.write('\n*********************************\nPrecision got form sklearn.logisticReg: {ps}\n'.format(ps=ps))
 #Confusion Matrix:
-cmat = confusion_matrix(pred_d2,y_test_d2)
+cmat = confusion_matrix(pred_logreg,y_test)
 print('Confusion Matirx:')
 print(cmat)
 fres.write('\n*******************************\nConfusion Matirx:\n')
 fres.write(np.array2string(cmat))
 
-for i in range(len(y_test_d2)):
-    if y_test_d2[i]:
+for i in range(len(y_test)):
+    if y_test[i]:
         gen = 'ro'
     else:
         gen = 'bo'
-    plt.plot(x_test_d2[i][0],x_test_d2[i][1],gen)
+    plt.plot(x_test[i][0],x_test[i][1],gen)
 plt.xlabel('Heights')
 plt.ylabel('Weights')
 plt.title('Actual Height vs Weight')
 #plt.show()
 plt.savefig('plot_actual_gender_weight_height_logreg.png', dpi=300, bbox_inches='tight')
 plt.clf()
-for i in range(len(pred_d2)):
-    if pred_d2[i]:
+for i in range(len(pred_logreg)):
+    if pred_logreg[i]:
         gen = 'ro'
     else:
         gen = 'bo'
-    plt.plot(x_test_d2[i][0],x_test_d2[i][1],gen)
+    plt.plot(x_test[i][0],x_test[i][1],gen)
 plt.xlabel('Heights')
 plt.ylabel('Weights')
 plt.title('Predicted Height vs Weight')
