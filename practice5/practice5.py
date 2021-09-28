@@ -8,7 +8,10 @@ from sklearn import datasets
 from matplotlib.colors import ListedColormap
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
-import subprocess,shlex
+import subprocess
+from sklearn.metrics import roc_curve
+from sklearn.metrics import plot_roc_curve
+from sklearn.metrics import confusion_matrix
 
 mpl.rc('axes', labelsize=14)
 mpl.rc('xtick', labelsize=12)
@@ -58,6 +61,7 @@ plot_training=True):
     if legend:
         plt.legend(loc="lower right", fontsize=14)
 
+
 #Loading the iris dataset
 iris = datasets.load_iris()
 X = iris.data[:,:2]
@@ -83,10 +87,10 @@ print("==============TESTING IRIS DATASET===============")
 fres.write("==============TESTING IRIS DATASET===============")
 testset_score = tree_clf.score(x_test,y_test)
 print("The score obtained by the test sets is: {scr}".format(scr=testset_score))
-fres.write("The score obtained by the test sets is: {scr}".format(scr=testset_score))
+fres.write("\nThe score obtained by the test sets is: {scr}".format(scr=testset_score))
 trainset_score = tree_clf.score(x_train,y_train)
 print("The score obtained by the train sets is: {scr}".format(scr=trainset_score)) 
-fres.write("The score obtained by the train sets is: {scr}".format(scr=trainset_score)) 
+fres.write("\nThe score obtained by the train sets is: {scr}".format(scr=trainset_score)) 
 
 
 
@@ -101,5 +105,120 @@ plt.text(3.2, 1.80, "Depth=1", fontsize=13)
 save_fig("decision_tree_decision_boundaries_plot")
 plt.show()
 
+tree_best = tree_clf.predict_proba(x_test)[:,1]
+cmat = confusion_matrix(tree_clf.predict(x_test),y_test)
+print('Confusion Matirx:')
+print(cmat)
+fres.write('\n*******************************\nConfusion Matirx:\n')
+fres.write(np.array2string(cmat)+'\n')
+
+
+###################################
+#Loading the wine dataset
+###################################
+
+wine = datasets.load_wine()
+X = wine.data[:,:2]
+y = wine.target
+x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.2, train_size=0.8, random_state=1, shuffle=True)
+tree_clf = DecisionTreeClassifier(random_state=0)
+
+#Entrenar al modelo
+tree_clf.fit(x_train,y_train)
+treename="wine_tree_2f"
+print(wine.feature_names[:2])
+#Creating the graphviz dot file for the iris dataset
+export_graphviz(tree_clf,out_file=os.path.join(IMAGES_PATH,treename+".dot"), feature_names=wine.feature_names[:2],class_names=wine.target_names,rounded=True,filled=True)
+Source.from_file(os.path.join(IMAGES_PATH,treename+".dot"))
+
+#Creating the tree png
+treepng = treename + ".png"
+cmd = ["dot", "-Tpng" , os.path.join(IMAGES_PATH,treename+".dot"), "-o" , os.path.join(IMAGES_PATH,treepng)]
+#print(cmd)
+p = subprocess.Popen(cmd)
+
+print("==============TESTING WINE DATASET===============")
+fres.write("\n\n==============TESTING WINE DATASET===============")
+testset_score = tree_clf.score(x_test,y_test)
+print("The score obtained by the test sets is: {scr}".format(scr=testset_score))
+fres.write("\nThe score obtained by the test sets is: {scr}".format(scr=testset_score))
+trainset_score = tree_clf.score(x_train,y_train)
+print("The score obtained by the train sets is: {scr}".format(scr=trainset_score)) 
+fres.write("\nThe score obtained by the train sets is: {scr}".format(scr=trainset_score)) 
+
+print(X[1])
+
+
+#plotting the wine
+plt.figure(figsize=(8, 4))
+plot_decision_boundary(tree_clf, X, y,iris=False,axes=[0, 15, 0, 10])
+#plt.plot([2.45, 2.45], [0, 3], "k-", linewidth=2)
+#plt.plot([2.45, 7.5], [1.75, 1.75], "k--", linewidth=2)
+#plt.text(1.40, 1.0, "Depth=0", fontsize=15)
+#plt.text(3.2, 1.80, "Depth=1", fontsize=13)
+save_fig("decision_tree_decision_boundaries_plot_"+treename)
+plt.show()
+
+tree_best = tree_clf.predict_proba(x_test)[:,1]
+cmat = confusion_matrix(tree_clf.predict(x_test),y_test)
+print('Confusion Matirx:')
+print(cmat)
+fres.write('\n*******************************\nConfusion Matirx:\n')
+fres.write(np.array2string(cmat)+'\n')
+
+
+###################################
+#Loading the Cancer dataset
+###################################
+
+can = datasets.load_breast_cancer()
+X = can.data[:,:2]
+y = can.target
+x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.2, train_size=0.8, random_state=1, shuffle=True)
+tree_clf = DecisionTreeClassifier(random_state=0)
+
+#Entrenar al modelo
+tree_clf.fit(x_train,y_train)
+treename="breast_cancer_tree_2f"
+
+#Creating the graphviz dot file for the iris dataset
+export_graphviz(tree_clf,out_file=os.path.join(IMAGES_PATH,treename+".dot"), feature_names=can.feature_names[:2],class_names=can.target_names,rounded=True,filled=True)
+Source.from_file(os.path.join(IMAGES_PATH,treename+".dot"))
+
+#Creating the tree png
+treepng = treename + ".png"
+cmd = ["dot", "-Tpng" , os.path.join(IMAGES_PATH,treename+".dot"), "-o" , os.path.join(IMAGES_PATH,treepng)]
+#print(cmd)
+p = subprocess.Popen(cmd)
+
+print("==============TESTING BREAST CANCER DATASET===============")
+fres.write("\n\n==============TESTING BREAST CANCER DATASET===============")
+testset_score = tree_clf.score(x_test,y_test)
+print("The score obtained by the test sets is: {scr}".format(scr=testset_score))
+fres.write("\nThe score obtained by the test sets is: {scr}".format(scr=testset_score))
+trainset_score = tree_clf.score(x_train,y_train)
+print("The score obtained by the train sets is: {scr}".format(scr=trainset_score)) 
+fres.write("\nThe score obtained by the train sets is: {scr}".format(scr=trainset_score)) 
+
+
+
+
+#plotting the wine
+plt.figure(figsize=(8, 4))
+plot_decision_boundary(tree_clf, X, y,iris=False,axes=[0, 30, 0, 30])
+#plt.plot([2.45, 2.45], [0, 15], "k-", linewidth=2)
+#plt.plot([2.45, 7.5], [1.75, 1.75], "k--", linewidth=2)
+#plt.text(1.40, 1.0, "Depth=0", fontsize=15)
+#plt.text(3.2, 1.80, "Depth=1", fontsize=13)
+print("decision_tree_decision_boundaries_plot_"+treename)
+save_fig("decision_tree_decision_boundaries_plot_"+treename)
+plt.show()
+
+tree_best = tree_clf.predict_proba(x_test)[:,1]
+cmat = confusion_matrix(tree_clf.predict(x_test),y_test)
+print('Confusion Matirx:')
+print(cmat)
+fres.write('\n*******************************\nConfusion Matirx:\n')
+fres.write(np.array2string(cmat)+'\n')
 
 fres.close()
