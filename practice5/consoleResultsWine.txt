@@ -1,0 +1,3 @@
+==============TESTING IRIS DATASET===============
+The score obtained by the test sets is: 0.9166666666666666
+The score obtained by the train sets is: 1.0
