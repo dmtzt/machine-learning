@@ -1,3 +1,6 @@
+##################################
+# Important!! This file runs the trees with just two features.
+######################################
 import numpy as np
 import os
 import matplotlib as mpl
