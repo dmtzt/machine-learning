@@ -3,6 +3,11 @@ from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.linear_model import LogisticRegression
+
+def printsep():
+    print('\n\n------------------------------------------------------------------------------------\n\n\n')
 
 digits = load_digits()
 X = digits.data
@@ -46,6 +51,11 @@ sigmoid_cmat = confusion_matrix(sigmoid_pred, y_test)
 
 # Logistic regression model
 # Usar valor 'ovr'
+log_model = LogisticRegression(multi_class='ovr')
+log_model.fit(x_train,y_train)
+log_pred = log_model.predict(x_test)
+log_ps = log_model.score(x_test,y_test)
+log_model_cmat = confusion_matrix(log_pred, y_test)
 
 # k-NN models
 # Neighbors, K, precision score and prediction with best performance
@@ -77,16 +87,34 @@ for k in n_neighbors_values:
         knn_bestmodel = nbrs
 
 # Naive-Bayes model
-
+nb_model = GaussianNB()
+nb_model.fit(x_train,y_train)
+nbpred = nb_model.predict(x_test)
+nb_ps = nb_model.score(x_test,y_test)
+nb_model_cmat = confusion_matrix(nbpred, y_test)
 
 # Print scores and confusion matrices
+printsep()
 print(
     'Linear SVM - ps: {ps} - confusion matrix:\n{cmat}'.format(ps=linear_ps, cmat=linear_cmat))
+printsep()
 print(
     'Polynomial SVM - ps: {ps} - confusion matrix:\n{cmat}'.format(ps=poly_ps, cmat=poly_cmat))
+printsep()
 print(
     'RBF SVM - ps: {ps} - confusion matrix:\n{cmat}'.format(ps=rbf_ps, cmat=rbf_cmat))
+printsep()
 print(
     'Sigmoid SVM - ps: {ps} - confusion matrix:\n{cmat}'.format(ps=sigmoid_ps, cmat=sigmoid_cmat))
+printsep()
+print(
+    'Logistic Regression - ps: {ps} - confusion matrix:\n{cmat}'.format(ps=log_ps, cmat=log_model_cmat))
+printsep()
 print(
     'k-NN - best k: {k} - ps: {ps} - confusion matrix:\n{cmat}'.format(k=k_best, ps=ps_best, cmat=cmat_best))
+printsep()
+print(
+    'Naive Bayes - ps: {ps} - confusion matrix:\n{cmat}'.format(ps=nb_ps, cmat=nb_model_cmat))
+
+
+
