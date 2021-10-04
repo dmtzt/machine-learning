@@ -1,10 +1,16 @@
 from sklearn import svm
+import numpy as np
 from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import roc_curve, auc
+from sklearn.preprocessing import label_binarize
+import matplotlib.pyplot as plt
+from itertools import cycle
+from sklearn.multiclass import OneVsRestClassifier
 
 def printsep():
     print('\n\n------------------------------------------------------------------------------------\n\n\n')
@@ -12,8 +18,14 @@ def printsep():
 digits = load_digits()
 X = digits.data
 y = digits.target
+y_bin = label_binarize(y, classes=[0,1,2,3,4,5,6,7,8,9])
+n_classes = y_bin.shape[1]
 x_train, x_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, train_size=0.8, random_state=1, shuffle=True)
+
+x_train_bin, x_test_bin, y_train_bin, y_test_bin = train_test_split(
+    X, y_bin, test_size=0.2, train_size=0.8, random_state=1, shuffle=True)
+
 
 # SVM models
 # Linear kernel: linearly separable data (faster)
@@ -93,6 +105,11 @@ nbpred = nb_model.predict(x_test)
 nb_ps = nb_model.score(x_test,y_test)
 nb_model_cmat = confusion_matrix(nbpred, y_test)
 
+def cmatnorm(cm):
+    cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+    return cm
+
+
 # Print scores and confusion matrices
 printsep()
 print(
@@ -109,12 +126,80 @@ print(
 printsep()
 print(
     'Logistic Regression - ps: {ps} - confusion matrix:\n{cmat}'.format(ps=log_ps, cmat=log_model_cmat))
+print('\n*********************Normalizada************************\n{cmat}'.format(cmat=cmatnorm(log_model_cmat)))
+#plotting the ROC curve
+y_score = log_model.decision_function(x_test_bin)# Plotting and estimation of FPR, TPR
+fpr = dict()
+tpr = dict()
+roc_auc = dict()
+for i in range(n_classes):
+    fpr[i], tpr[i], _ = roc_curve(y_test_bin[:, i], y_score[:, i])
+    roc_auc[i] = auc(fpr[i], tpr[i])
+colors = cycle(['blue', 'red', 'green'])
+for i, color in zip(range(n_classes), colors):
+    plt.plot(fpr[i], tpr[i], color=color, lw=1.5, label='ROC curve of class {0} (area = {1:0.2f})' ''.format(i+1, roc_auc[i]))
+plt.plot([0, 1], [0, 1], 'k-', lw=1.5)
+plt.xlim([-0.05, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver operating characteristic for multi-class data')
+plt.legend(loc="lower right")
+plt.savefig('ROC curves Log Model.png',
+            dpi=300, bbox_inches='tight')
+plt.clf()
+#plt.show()
+
 printsep()
 print(
     'k-NN - best k: {k} - ps: {ps} - confusion matrix:\n{cmat}'.format(k=k_best, ps=ps_best, cmat=cmat_best))
+print('\n*********************Normalizada************************\n{cmat}'.format(cmat=cmatnorm(cmat_best)))
+#plotting the ROC curve
+y_score = OneVsRestClassifier(KNeighborsClassifier(n_neighbors=k_best, algorithm='brute')).fit(x_test_bin, y_test_bin).predict_proba(x_test_bin)# Plotting and estimation of FPR, TPR
+fpr = dict()
+tpr = dict()
+roc_auc = dict()
+for i in range(n_classes):
+    fpr[i], tpr[i], _ = roc_curve(y_test_bin[:, i], y_score[:, i])
+    roc_auc[i] = auc(fpr[i], tpr[i])
+colors = cycle(['blue', 'red', 'green'])
+for i, color in zip(range(n_classes), colors):
+    plt.plot(fpr[i], tpr[i], color=color, lw=1.5, label='ROC curve of class {0} (area = {1:0.2f})' ''.format(i+1, roc_auc[i]))
+plt.plot([0, 1], [0, 1], 'k-', lw=1.5)
+plt.xlim([-0.05, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver operating characteristic for multi-class data')
+plt.legend(loc="lower right")
+plt.savefig('ROC curves k-NN Model.png',
+            dpi=300, bbox_inches='tight')
+plt.clf()
+#plt.show()
+
 printsep()
 print(
     'Naive Bayes - ps: {ps} - confusion matrix:\n{cmat}'.format(ps=nb_ps, cmat=nb_model_cmat))
-
-
+print('\n*********************Normalizada************************\n{cmat}'.format(cmat=cmatnorm(nb_model_cmat)))
+#plotting the ROC curve
+y_score = OneVsRestClassifier(GaussianNB()).fit(x_test_bin, y_test_bin).predict_proba(x_test_bin)# Plotting and estimation of FPR, TPR
+fpr = dict()
+tpr = dict()
+roc_auc = dict()
+for i in range(n_classes):
+    fpr[i], tpr[i], _ = roc_curve(y_test_bin[:, i], y_score[:, i])
+    roc_auc[i] = auc(fpr[i], tpr[i])
+colors = cycle(['blue', 'red', 'green'])
+for i, color in zip(range(n_classes), colors):
+    plt.plot(fpr[i], tpr[i], color=color, lw=1.5, label='ROC curve of class {0} (area = {1:0.2f})' ''.format(i+1, roc_auc[i]))
+plt.plot([0, 1], [0, 1], 'k-', lw=1.5)
+plt.xlim([-0.05, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver operating characteristic for multi-class data')
+plt.legend(loc="lower right")
+plt.savefig('ROC curves naive-bayes Model.png',
+            dpi=300, bbox_inches='tight')
+#plt.show()
 
